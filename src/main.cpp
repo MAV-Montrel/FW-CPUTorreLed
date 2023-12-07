@@ -1,31 +1,30 @@
 #include <Arduino.h>
-#include "OTA_Gravacao.h"
-#include "SK6812Driver.h"
-#include "SK6812_Driver2.h"
+#include "../lib/OTA/OTA_Gravacao.h"
+#include "App_torre.h"
 
-#define NUM_LEDS 1
-#define DATA_PIN 16
 int Tecla = 4;
-
-SK6812Driver leds(NUM_LEDS, DATA_PIN);
-
-// Crie uma instância da classe SK6812
-SK6812 ledStrip(NUM_LEDS);
-
 void setup() {
     Serial.begin(115200);
     pinMode(Tecla, INPUT_PULLUP);
-
-   // ledStrip.set_output(6);  // Substitua 6 pelo pino que você está usando
-
-    leds.begin();
+    delay(100);   
+    while(digitalRead(Tecla) == 0){
+      static int cont = 0;
+      if(cont > 1000){
+        cont = 0;
+        Serial.println("Modo gravação");
+        OTA_init();
+        while(1){
+          OTA_handleUpload(); 
+          delay(1);
+        }
+      }
+      cont++;      
+      delay(1);
+    }
+   
+  APP_TORRE_init();
 }
 
 void loop() {
- 
-   leds.setPixelColor(0,10,0,0,0);
-
-   leds.show();
-
-  delay(2000);  // Aguarde 1 segundo
+  APP_TORRE_run();
 }
